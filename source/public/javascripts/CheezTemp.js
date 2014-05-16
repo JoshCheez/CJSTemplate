@@ -11,63 +11,111 @@
     var col = 4
     var row = 10;
     var valid = 0;
+    var queue;
+    var container;
+    var score = 0;
+    var manifest;
+    var preloader;
+    var ImageArray = [];
 
 
-    function FillGrid(array, canvaswidth, canvasheight) {
+    function FillGrid(array, canvaswidth, canvasheight, dogeimg, grumpycatimg, container) {
         var startx = 0;
         var starty = (canvasheight - height);
-        for (var x = 0; x < CompleteGrid.length; x++) {
-            for (var y = 0; y < CompleteGrid[0].length; y++) {
-                CompleteGrid[x][y] = new Object();
-                CompleteGrid[x][y] = { tiletype: 0, y: 0, x: 0, shape: 0};
+        for (var x = 0; x < array.length; x++) {
+            for (var y = 0; y < array[0].length; y++) {
+                array[x][y] = new Object();
+                array[x][y] = { tiletype: 0, y: 0, x: 0, img: 0 };
             }
-            random_tile = (Math.floor(Math.random() * CompleteGrid[0].length))
-            CompleteGrid[x][random_tile].tiletype = 1;
-            console.log("Random = " + random_tile);
-        }
-        console.log(CompleteGrid);
+            random_tile = (Math.floor(Math.random() * array[0].length))
+            array[x][random_tile].tiletype = 1;
 
-        for (var k = 0; k < 5; k++) {
-            console.log(CompleteGrid[0].length);
-            for (var i = 0; i < CompleteGrid[0].length; i++) {
-                if (CompleteGrid[k][i].tiletype === 0) {
-                    console.log("k = " + k);
-                    console.log("i = " + i);
-                    bgWhite[k][i] = new createjs.Shape();
-                    bgWhite.graphics.beginStroke("#F00").beginFill("#FFFFFF").drawRect(startx, starty, width, height);
-                    CompleteGrid[k][i].shape = bgWhite;
-                    CompleteGrid[k][i].x = startx;
-                    CompleteGrid[k][i].y = starty;
+        }
+   
+       
+        for (var k = 0; k < array.length; k++) {
+
+            for (var i = 0; i < array[0].length; i++) {
+                if (array[k][i].tiletype === 0) {
+                    var grumpybmp = new createjs.Bitmap("images/grumpycat.jpg");
+                    grumpybmp.x = startx;
+                    grumpybmp.y = starty;
+                    array[k][i].img = grumpybmp;
                     startx += width;
-                   // CompleteGrid[k][i].shape.draw(context);
-                    //stage.addChild(CompleteGrid[k][i].shape);
-                } else if (CompleteGrid[k][i].tiletype === 1) {
-                    console.log("k = " + k);
-                    console.log("i = " + i);
-                    bgBlack = new createjs.Shape();
-                    bgBlack.graphics.beginStroke("F00").beginFill("#000000").drawRect(startx, starty, width, height);
-                    CompleteGrid[k][i].shape = bgBlack;
-                    CompleteGrid[k][i].x = startx;
-                    CompleteGrid[k][i].y = starty;
+                    container.addChild(array[k][i].img);
+
+                } else if (array[k][i].tiletype === 1) {
+                    var dogebmp = new createjs.Bitmap("images/doge.jpg");
+                    dogebmp.x = startx;
+                    dogebmp.y = starty;
+                    array[k][i].img = dogebmp;
                     startx += width;
-                   // CompleteGrid[k][i].shape.draw(context);
-                   // stage.addChild(CompleteGrid[k][i].shape);
+                    container.addChild(array[k][i].img);
+
                 } 
             }
             starty -= height;
             startx = 0;
         }
+
+        stage.addChild(container);
+        
     }
 
-    function DisplayGrid() {
-        for (var k = 0; k < 5; k++) {
-            for (var i = 0; i < CompleteGrid[0].length; i++) {
-                 CompleteGrid[k][i].shape.draw(context);
-                 stage.addChild(CompleteGrid[k][i].shape);
-            }
+    function AddScore() {
+        score += 1;
+        scoretext.text = "Score = " + score;
+        scorestage.update();
+    }
+
+    function AddtoGrid(array, canvasheight) {
+        var temparray = new Array();
+        var lastknownx = 0;
+        var lastknowny;
+
+
+        for (var y = 0; y < array[0].length; y++) {
+            temparray[y] = new Object();
+            temparray[y] = { tiletype: 0, y: 0, x: 0, img: 0 };
         }
-    }
+        random_tile = (Math.floor(Math.random() * array[0].length))
+        temparray[random_tile].tiletype = 1;
 
+        array.push(temparray);
+        lastknowny = (container.children[container.children.length - 1].y - height);
+        for (var i = 0; i < array[0].length; i++) {
+            if (array[array.length -1][i].tiletype === 0) {
+                var grumpybmp = new createjs.Bitmap("images/grumpycat.jpg");
+                //lastknownx = container.children[container.children.length - 1].x;
+               // lastknowny = (container.children[container.children.length - 1].y - height);
+                console.log("Last Y = " + lastknowny);
+                console.log("Last X = " + lastknownx);
+                grumpybmp.x = lastknownx;
+                grumpybmp.y = lastknowny;
+                array[array.length - 1][i].img = grumpybmp;
+                lastknownx += width;
+                container.addChild(array[array.length - 1][i].img);
+
+            } else if (array[array.length - 1][i].tiletype === 1) {
+                var dogebmp = new createjs.Bitmap("images/doge.jpg");
+                //lastknownx = container.children[container.children.length - 1].x;
+               // lastknowny = (container.children[container.children.length - 1].y - height);
+                console.log("Last Y = " + lastknowny);
+                console.log("Last X = " + lastknownx);
+                dogebmp.x = lastknownx;
+                dogebmp.y = lastknowny;
+                array[array.length - 1][i].img = dogebmp;
+                lastknownx += width;
+                container.addChild(array[array.length - 1][i].img);
+
+            }
+            //lastknowny -= height;
+
+        }
+
+
+
+    }
 
     function CheckMatching(location) {
         if (CompleteGrid[0][location].tiletype === 1) {
@@ -79,16 +127,110 @@
         }
     }
 
-    function UpdateGrid() {
-        for (x = 0; x < 5; x++) {
-            for (y = 0; y < CompleteGrid[0].length; y++) {
-                CompleteGrid[x][y].y += height;
+    function addTitleView() {
+        var menu = new createjs.Bitmap("images/test.jpg");
+        TitleView.addChild(menu);
+        stage.update(); 
+
+    }
+
+
+    function handleFileLoad(event) {
+        switch (event.type) {
+            case PreloadJS.IMAGE:
+                var image = new Image();
+                image.src = event.src;
+                image.id = event.id;
+                ImageArray.push(image);
+                console.log(ImageArray);
+                break;
+            case PreloadJS.SOUND:
+                break;
+
+                
+        }
+
+        }
+
+    function handleComplete(event) {
+
+
+        var w = stage.canvas.width;
+        var h = stage.canvas.height;
+        height = 75;
+        width = 50;
+        switch (event.type) {
+            case PreloadJS.IMAGE:
+                var doge = new createjs.Bitmap(preloader.getResult("doge"));
+                var grumpycat = new createjs.Bitmap(preloader.getResult("grumpycat"));
+        }
+        FillGrid(CompleteGrid, w, h, doge, grumpycat, container);
+
+        scoretext = new createjs.Text(('Score = ' + score), 'bold 20px Arial', 'black');
+        scorestage.addChild(scoretext);
+        scorestage.update();
+
+
+    }
+
+
+
+    function UpdateGrid(code) {
+        var h = stage.canvas.height;
+        for (x = 0; x < CompleteGrid[0].length; x++) {
+            container.removeChild(CompleteGrid[0][x].img);
+            stage.removeChild(CompleteGrid[0][x].img);
+        }
+
+        CompleteGrid.splice(0, 1);
+
+        for (k = 0; k < CompleteGrid.length; k++) {
+            for (i = 0; i < CompleteGrid[0].length; i++) {
+                CompleteGrid[k][i].img.y += height;
             }
         }
-        stage.removeAllChildren();
+
+        AddtoGrid(CompleteGrid, h);
         stage.update();
-        DisplayGrid();
-        stage.update();
+
+    }
+
+    function onMouseDown(event) {
+        var keycode = event.keyCode;
+        if (event.keyCode === 65) {
+            valid = CheckMatching(0);
+            if (valid == 1) {
+                UpdateGrid(keycode);
+                AddScore();
+            } else {
+                console.log("YOU LOSE");
+            }
+        } else
+            if (event.keyCode === 83) {
+                valid = CheckMatching(1);
+                if (valid == 1) {
+                    UpdateGrid(keycode);
+                    AddScore();
+                } else
+                    console.log("YOU LOSE");
+            } else
+                if (event.keyCode === 68) {
+                    valid = CheckMatching(2);
+                    if (valid == 1) {
+                        UpdateGrid(keycode);
+                        AddScore();
+                    } else
+                        console.log("YOU LOSE");
+                } else
+                    if (event.keyCode === 70) {
+                        valid = CheckMatching(3);
+                        if (valid == 1) {
+                            UpdateGrid(keycode);
+                            AddScore();
+                        } else
+                            console.log("YOU LOSE");
+                    }
+
     }
     
     function init() {
@@ -97,109 +239,38 @@
         context = canvas.getContext("2d");
         stage = new createjs.Stage(canvas);
         stage.mouseEventsEnabled = true;
+        container = new createjs.Container();
+        TitleView = new createjs.Container();
+
+        scorecanvas = document.getElementById('score');
+        scorecontext = scorecanvas.getContext("2d");
+        scorestage = new createjs.Stage(scorecanvas);
+
+        manifest = [
+            { src: "images/doge.jpg", id: "doge" },
+            { src: "images/grumpycat.jpg", id: "grumpycat" },
+            { src: "images/btnStart.jpg", id: "btnStart" },
+
+        ]
+
+       // queue = new createjs.LoadQueue(false);
+        // queue.addEventListener("complete", handleComplete);
+        preloader = new PreloadJS();
+        preloader.onComplete = handleComplete;
+        preloader.onFileLoad = handleFileLoad;
+        preloader.loadManifest(manifest);
 
 
-        var queue = new createjs.LoadQueue(false);
-        queue.on("fileload", handleFileLoad, this);
-        queue.on("complete", handleComplete, this);
-        queue.loadFile({ id: "doge", src: "https://pbs.twimg.com/profile_images/378800000822867536/3f5a00acf72df93528b6bb7cd0a4fd0c.jpeg"});
-        queue.loadFile({ id: "grumpycat", src: "http://static3.businessinsider.com/image/5238c9c5ecad047f12b2751a/internet-famous-grumpy-cat-just-landed-an-endorsement-deal-with-friskies.jpg"});
-        queue.load();
 
-        function handleFileLoad(event) {
-            var item = event.item;
-           // stage.addChild(item);
-        }
-        function handleComplete(event) {
-            var item = event.item;
+       // queue.loadManifest(manifest);
 
-        }
-
-
-
-        var container = new createjs.Container();
-
-        var w = stage.canvas.width;
-        var h = stage.canvas.height;
-        height = 75;
-        width = 50;
-        //var doge = new createjs.Bitmap("https://pbs.twimg.com/profile_images/378800000822867536/3f5a00acf72df93528b6bb7cd0a4fd0c.jpeg");
-        //var grumpycat = new createjs.Bitmap("http://static3.businessinsider.com/image/5238c9c5ecad047f12b2751a/internet-famous-grumpy-cat-just-landed-an-endorsement-deal-with-friskies.jpg");
-        //var grumpycat = new Image();
-        //doge.src = "https://pbs.twimg.com/profile_images/378800000822867536/3f5a00acf72df93528b6bb7cd0a4fd0c.jpeg";
-        //grumpycat.src = "http://static3.businessinsider.com/image/5238c9c5ecad047f12b2751a/internet-famous-grumpy-cat-just-landed-an-endorsement-deal-with-friskies.jpg";
-        //console.log(doge);
-        //grumpycat.scaleX = .25;
-       // grumpycat.scaleY = .25;
-        //doge.x = 0;
-        //doge.y = 0;
-        //grumpycat.regX = height;
-        //grumpycat.regY = width;
-        //grumpycat.x = 50;
-        //grumpycat.y = 75;
-
-        //container.addChild(grumpycat)
-       // stage.addChild(container);
-
+       // queue.load();
 
         CompleteGrid = new Array(row);
         for (var i = 0; i < CompleteGrid.length; i++) {
             CompleteGrid[i] = new Array(col);
         }
-        console.log(CompleteGrid);
 
-        
-        //bgBlack = new createjs.Shape();
-        //bgBlack.graphics.beginStroke("F00").beginFill("#000000").drawRect(0, 0, 50, 75);
-        //bgBlack.draw(context)
-        //bgBlack.graphics.beginStroke("#F00").beginFill("#000000").drawRect(0, 0, width, height).draw(context);
-        //bgBlack.x = 1;
-        //stage.addChild(bgBlack);
-        //context.fillText(bgBlack.x, 5, 5)
-
-    
-        //bgWhite = new createjs.Shape();
-        //bgWhite.graphics.beginStroke("#F00").beginFill("#FFFFFF").drawRect(0, 100, width, height).draw(context);
-        //bgWhite.x = 0;
-        //context.fillText(bgWhite.x, 5, 5)
-        //stage.addChild(bgWhite);
-
-        function onMouseDown(event) {
-            if (event.keyCode === 65) {
-                valid = CheckMatching(0);
-                if (valid === 1) {
-                    //update the graph
-                    for (x = 0; x < CompleteGrid[0].length; x++) {
-                        stage.removeChild(CompleteGrid[0][x].shape);
-                    }
-                    
-                    CompleteGrid.splice(0, 1);
-                    stage.update();
-                    UpdateGrid(); 
-                    //stage.removeAllChildren();
-                    //DisplayGrid();
-                    console.log("df");
-                } else {
-                    //start over
-                }
-                console.log ("a");
-            } else
-                if (event.keyCode === 83) {
-                    valid = CheckMatching(1);
-                    console.log("s");
-                } else
-                    if (event.keyCode === 68) {
-                        valid = CheckMatching(2);
-                        console.log("d");
-                    } else
-                        if (event.keyCode === 70) {
-                            valid = CheckMatching(3);
-                            console.log("f");
-                        }
-         
-        }
-       // FillGrid(CompleteGrid, w, h);
-       //DisplayGrid();
         createjs.Ticker.addEventListener("tick", handleTick);
         canvas.setAttribute("tabindex", 0);
         canvas.addEventListener("keydown", onMouseDown);
@@ -209,16 +280,7 @@
 
     function handleTick(event) {
 
-        
-        //console.log (bgShape.x);
-        //bgShape.x += dx
-        //if ((bgShape.x + width)> endPos[0] || bgShape.x < StartPos[0] ||
-        //    bgShape.y > endPos[1] || bgShape.y < StartPos[1]) {
-        //    dx = -dx;
-        //    //dy = -dy;
-        //}
-
-
+      
         stage.update();
     }
 
