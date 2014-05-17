@@ -17,6 +17,12 @@
     var manifest;
     var preloader;
     var ImageArray = [];
+    var totalloaded = 0;
+    var doge;
+    var grumpycat;
+    var btnStart;
+    var LoseImg;
+    var Replay;
 
 
     function FillGrid(array, canvaswidth, canvasheight, dogeimg, grumpycatimg, container) {
@@ -63,6 +69,7 @@
     }
 
     function AddScore() {
+        
         score += 1;
         scoretext.text = "Score = " + score;
         scorestage.update();
@@ -128,8 +135,18 @@
     }
 
     function addTitleView() {
-        var menu = new createjs.Bitmap("images/test.jpg");
-        TitleView.addChild(menu);
+        for (x = 0; x < manifest.length; x++) {
+            if (manifest[x].id == 'btnStart') {
+                btnStart = new createjs.Bitmap(manifest[x].src);
+                break;
+            }
+        }
+        btnStart.name = 'btnStart';
+        btnStart.addEventListener("click", function (event) { addGameView() });
+        btnStart.x = 50;
+        btnStart.y = 50;
+        TitleView.addChild(btnStart);
+        stage.addChild(TitleView);
         stage.update(); 
 
     }
@@ -141,6 +158,25 @@
                 var image = new Image();
                 image.src = event.src;
                 image.id = event.id;
+                image.onload = handleLoadComplete();
+                switch (image.id) {
+                    case 'doge':
+                        doge = new createjs.Bitmap(image);
+                        break;
+                    case 'grumpycat':
+                        grumpycat = new createjs.Bitmap(image);
+                        break;
+                    case 'btnStart':
+                        btnStart = new createjs.Bitmap(image);
+                        break;
+                    case 'LoseImg':
+                        LoseImg = new createjs.Bitmap(image);
+                        break;
+                    case 'Replay':
+                        Replay = new createjs.Bitmap(image);
+                        break;
+                    
+                }
                 ImageArray.push(image);
                 console.log(ImageArray);
                 break;
@@ -150,11 +186,22 @@
                 
         }
 
+    }
+
+    function handleLoadComplete(event) {
+        totalloaded++;
+        if (manifest.length == totalloaded) {
+            addTitleView();
         }
 
-    function handleComplete(event) {
+    }
 
-
+    function addGameView() {
+        canvas.removeEventListener("click", Replay);
+        stage.removeChild(Replay);
+        canvas.addEventListener("keydown", onKeyDown);
+        stage.removeChild(TitleView);
+        TitleView = null;
         var w = stage.canvas.width;
         var h = stage.canvas.height;
         height = 75;
@@ -169,6 +216,42 @@
         scoretext = new createjs.Text(('Score = ' + score), 'bold 20px Arial', 'black');
         scorestage.addChild(scoretext);
         scorestage.update();
+
+    }
+
+    function addLoseScreen() {
+        stage.removeAllChildren();
+        canvas.removeEventListener("keydown", onKeyDown);
+        stage.addChild(LoseImg);
+        Replay.x = 75;
+        Replay.y = 100;
+        Replay.name = 'Replay';
+        stage.addChild(Replay);
+        Replay.addEventListener("click", function (event) { addGameView() });
+        score = 0;
+        scoretext.text = ""
+        scorestage.update();
+        stage.update();
+
+    }
+
+    function handleComplete(event) {
+
+
+        //var w = stage.canvas.width;
+        //var h = stage.canvas.height;
+        //height = 75;
+        //width = 50;
+        //switch (event.type) {
+        //    case PreloadJS.IMAGE:
+        //        var doge = new createjs.Bitmap(preloader.getResult("doge"));
+        //        var grumpycat = new createjs.Bitmap(preloader.getResult("grumpycat"));
+        //}
+        //FillGrid(CompleteGrid, w, h, doge, grumpycat, container);
+
+        //scoretext = new createjs.Text(('Score = ' + score), 'bold 20px Arial', 'black');
+        //scorestage.addChild(scoretext);
+        //scorestage.update();
 
 
     }
@@ -195,7 +278,7 @@
 
     }
 
-    function onMouseDown(event) {
+    function onKeyDown(event) {
         var keycode = event.keyCode;
         if (event.keyCode === 65) {
             valid = CheckMatching(0);
@@ -204,6 +287,7 @@
                 AddScore();
             } else {
                 console.log("YOU LOSE");
+                addLoseScreen();
             }
         } else
             if (event.keyCode === 83) {
@@ -211,24 +295,30 @@
                 if (valid == 1) {
                     UpdateGrid(keycode);
                     AddScore();
-                } else
+                } else {
                     console.log("YOU LOSE");
+                    addLoseScreen();
+                }
             } else
                 if (event.keyCode === 68) {
                     valid = CheckMatching(2);
                     if (valid == 1) {
                         UpdateGrid(keycode);
                         AddScore();
-                    } else
+                    } else {
                         console.log("YOU LOSE");
+                        addLoseScreen();
+                    }
                 } else
                     if (event.keyCode === 70) {
                         valid = CheckMatching(3);
                         if (valid == 1) {
                             UpdateGrid(keycode);
                             AddScore();
-                        } else
+                        } else {
                             console.log("YOU LOSE");
+                            addLoseScreen();
+                        }
                     }
 
     }
@@ -250,6 +340,8 @@
             { src: "images/doge.jpg", id: "doge" },
             { src: "images/grumpycat.jpg", id: "grumpycat" },
             { src: "images/btnStart.jpg", id: "btnStart" },
+            { src: "images/LoseImg.jpg", id: "LoseImg" },
+            { src: "images/Replay.jpg", id: "Replay" }
 
         ]
 
@@ -273,7 +365,7 @@
 
         createjs.Ticker.addEventListener("tick", handleTick);
         canvas.setAttribute("tabindex", 0);
-        canvas.addEventListener("keydown", onMouseDown);
+
 
     }
     
