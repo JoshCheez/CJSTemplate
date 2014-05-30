@@ -1,20 +1,7 @@
 body {
   padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
-
 }
 a {
   color: #00b7ff;
 }
-  #score
-      {
-          position:absolute;
-          left:0;
-          top:0;
-      }
-  #mainwindow
-  {
-      position:absolute;
-      left:0;
-      top:25;
-  }
