@@ -93,7 +93,7 @@
 
         for (var y = 0; y < array[0].length; y++) {
             temparray[y] = new Object();
-            temparray[y] = { tiletype: 0, y: 0, x: 0, img: 0 };
+            temparray[y] = { tiletype: 0, y: 0, x: 0, img: 0, onScreen: false, clicked: false };
         }
         random_tile = (Math.floor(Math.random() * array[0].length))
         temparray[random_tile].tiletype = 1;
@@ -283,6 +283,7 @@
             for (x = 0; x < CompleteGrid[0].length; x++) {
                 if (CompleteGrid[0][x].tiletype == 1) {
                     loc = x;
+                    break;
                 }
             }
             if (CompleteGrid[0][loc].clicked == false) { addLoseScreen(); };
@@ -470,7 +471,7 @@
       
 
         if (RelayOn == true) {
-            tickspeed += .001;
+            tickspeed += .003;
             for (x = 0; x < CompleteGrid.length; x++) {
                 for (y = 0; y < CompleteGrid[0].length; y++) {
                     CompleteGrid[x][y].img.y += tickspeed;
@@ -492,7 +493,7 @@
                 for (k = 0; k < CompleteGrid[y].length; k++) {
                     if (CompleteGrid[y][k].img.y > ScoreBG.image.height) {
                         CompleteGrid[y][k].onScreen = true;
-                        console.log("on screen");
+                        //console.log("on screen");
                     }
                 }
             }
