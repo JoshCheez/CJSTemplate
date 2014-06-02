@@ -26,6 +26,7 @@
     var tick = 40;
     var canvasw;
     var canvash;
+    var speed;
 
 
 
@@ -145,22 +146,33 @@
     }
 
     function addTitleView() {
+
         stage.removeAllChildren();
         for (x = 0; x < manifest.length; x++) {
             if (manifest[x].id == 'btnStart') {
-                btnStart = new createjs.Bitmap(manifest[x].src);
+                //btnStart = new createjs.Bitmap(manifest[x].src);
             } else
                 if (manifest[x].id == 'btnTimed') {
-                    btnTimed = new createjs.Bitmap(manifest[x].src);
+                    //btnTimed = new createjs.Bitmap(manifest[x].src);
                 }
 
         }
         btnStart.name = 'btnStart';
-        btnStart.addEventListener("click", function (event) { addGameView() });
-        btnStart.x = 50;
+ 
         btnStart.y = 50;
+        btnStart.x = -100;
+        createjs.Tween.get(btnStart)
+                 .wait(50)
+                 .to({x: 50}, 500, createjs.Ease.quadInOut);
+       btnStart.addEventListener("click", function (event) { addGameView() });
+       // btnStart.y = 50;
 
         btnTimed.name = 'btnTimed';
+        btnTimed.y = 50;
+        btnTimed.x = -120;
+        createjs.Tween.get(btnTimed)
+                 .wait(50)
+                 .to({ x: 50 }, 500, createjs.Ease.quadInOut);
         btnTimed.addEventListener("click", function (event) { addTimedScreen() });
         btnTimed.x = 50;
         btnTimed.y = 120;
@@ -237,9 +249,12 @@
         FillGrid(CompleteGrid, canvasw, canvash, doge, grumpycat, container);
 
         scoretext = new createjs.Text(('Score = ' + score), 'bold 20px Arial', 'black');
+        speed = new createjs.Text("0", 'bold 20px Arial', 'black');
+        speed.x = 120;
+        
         stage.addChildAt(ScoreBG, stage.children.length);
         stage.addChildAt(scoretext, stage.children.length);
-
+        stage.addChildAt(speed, stage.children.length);
 
     }
 
@@ -297,7 +312,10 @@
         Timed = false;
         RelayOn = false;
         tickspeed = 1;
+
         stage.removeAllChildren();
+        console.log(stage);
+        stage.removeChild(TitleView);
         canvas.removeEventListener("keydown", onUnTimedKeyDown);
         canvas.removeEventListener("keydown", onTimedKeyDown);
         stage.addChild(LoseImg);
@@ -407,15 +425,7 @@
 
     }
 
-    function TweenTest() {
-        doge = new createjs.Bitmap("images/doge.jpg");
-        stage.addChild(doge);
-        stage.update();
-        createjs.Tween.get(doge, { loop: true })
-                .wait(1000)
-                .to({ y: 200 }, 1000, createjs.Ease.quadInOut)
-                .to({ y: 0 }, 500, createjs.Ease.quadInOut);
-    }
+
     
     function init() {
 
@@ -469,9 +479,11 @@
 
     function handleTick(event) {
       
-
+       
+       // scoretext.text = "Score = " + score;
         if (RelayOn == true) {
-            tickspeed += .003;
+            tickspeed += .005;
+            speed.text = (tickspeed.toFixed(3) + "/s");
             for (x = 0; x < CompleteGrid.length; x++) {
                 for (y = 0; y < CompleteGrid[0].length; y++) {
                     CompleteGrid[x][y].img.y += tickspeed;
